@@ -1,15 +1,18 @@
 const jwt = require("jsonwebtoken");
 const customError = require("../utils/customError");
 const prisma = require("../models");
-
+// do this middleware before do todoRouter middleware
+// authenticate user before create todo
 module.exports = async (req, res, next) => {
   try {
     // check req.headers -- have Authorization key
     const authorization = req.headers.authorization;
     if (!authorization) {
       throw customError("Unauthorize", 401);
+      // or next(err) : err = customError()
     }
-    if (!authorization.startsWith("Bearer")) {
+    // if (!authorization.startsWith("Bearer"))
+    if (!/^Bearer/.test(authorization)) {
       throw customError("Unauthorize", 401);
     }
     const token = authorization.split(" ")[1];

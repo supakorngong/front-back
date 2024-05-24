@@ -50,26 +50,25 @@ const login = async (req, res, next) => {
   try {
     const { username, password } = req.body;
     // validation
-    // find username in prisma.user
-    //check password
-    //create jwt-token
-    //make payload = {id,username}
-    // jwt.sign + {expiresIn : '7d'}
-    //response jwt-token
     if (!username && !password) return next(customError("fill input", 400));
+    // find username in prisma.user
     const targetUser = await prisma.user.findUnique({
       where: {
         username: username,
       },
     });
     if (!targetUser) return next(customError("invalid login", 400));
-    //   console.log(gong);
+    //check password
     const passwok = await bcrypt.compare(password, targetUser.password);
     if (!passwok) throw customError("invalid login", 400);
+    //create jwt-token
+    //make payload = {id,username}
     const payload = { id: targetUser.id };
     //ไม่ต้องrequire('dotenv').config()เพราะทําไปเเล้ว เป็นเรื่อง call stack load รอบเดียวพอ
+    // jwt.sign + {expiresIn : '7d'}
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "7d" });
     console.log(token);
+    //response jwt-token
     res.json({ token: token });
   } catch (err) {
     next(err);
